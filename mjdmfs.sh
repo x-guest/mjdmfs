@@ -1201,35 +1201,52 @@ clear
 echo -e "${BGGREEN}${WHITE} ${NORMAL}${WHITE} Настраиваем систему IP телефонии FreeSWITCH ${NORMAL}"
 echo
 # Создаем директорию usr»share»freeswitch/htdocs/portal
-echo -e "${BGGREEN}${WHITE} 1 из 7 ${NORMAL}${WHITE} Создаем директорию usr»share»freeswitch/htdocs/portal ${NORMAL}"
+echo -e "${BGGREEN}${WHITE} 1 из 8 ${NORMAL}${WHITE} Создаем директорию usr»share»freeswitch/htdocs/portal ${NORMAL}"
 mkdir /usr/share/freeswitch/htdocs/portal
 echo
 # Скачиваем файлы PORTAL в директорию usr»share»freeswitch»htdocs»portal
-echo -e "${BGGREEN}${WHITE} 2 из 7 ${NORMAL}${WHITE} Скачиваем файлы PORTAL в директорию usr»share»freeswitch»htdocs»portal ${NORMAL}"
+echo -e "${BGGREEN}${WHITE} 2 из 8 ${NORMAL}${WHITE} Скачиваем файлы PORTAL в директорию usr»share»freeswitch»htdocs»portal ${NORMAL}"
 git clone https://github.com/seven1240/FreeSWITCH-Portal.git /usr/share/freeswitch/htdocs/portal
 echo
 # Настраиваем vars.xml.
-echo -e "${BGGREEN}${WHITE} 3 из 7 ${NORMAL}${WHITE} Настраиваем vars.xml. ${NORMAL}"
+echo -e "${BGGREEN}${WHITE} 3 из 8 ${NORMAL}${WHITE} Настраиваем vars.xml. ${NORMAL}"
 mv /etc/freeswitch/vars.xml /etc/freeswitch/vars.xml.noload
 cp ./freeswitch/vars.xml /etc/freeswitch/vars.xml
 echo
 # Настраиваем internal.xml.
-echo -e "${BGGREEN}${WHITE} 4 из 7 ${NORMAL}${WHITE} Настраиваем internal.xml. ${NORMAL}"
+echo -e "${BGGREEN}${WHITE} 4 из 8 ${NORMAL}${WHITE} Настраиваем internal.xml. ${NORMAL}"
 mv /etc/freeswitch/sip_profiles/internal.xml /etc/freeswitch/sip_profiles/internal.xml.noload
 cp ./freeswitch/sip_profiles/internal.xml /etc/freeswitch/sip_profiles/internal.xml
 echo
 # Настраиваем modules.conf.xml.
-echo -e "${BGGREEN}${WHITE} 5 из 7 ${NORMAL}${WHITE} Настраиваем modules.conf.xml. ${NORMAL}"
+echo -e "${BGGREEN}${WHITE} 5 из 8 ${NORMAL}${WHITE} Настраиваем modules.conf.xml. ${NORMAL}"
 mv /etc/freeswitch/autoload_configs/modules.conf.xml /etc/freeswitch/autoload_configs/modules.conf.xml.noload
 cp ./freeswitch/autoload_configs/modules.conf.xml /etc/freeswitch/autoload_configs/modules.conf.xml
 echo
 # Настраиваем xml_rpc.conf.xml.
-echo -e "${BGGREEN}${WHITE} 6 из 7 ${NORMAL}${WHITE} Настраиваем xml_rpc.conf.xml. ${NORMAL}"
+echo -e "${BGGREEN}${WHITE} 6 из 8 ${NORMAL}${WHITE} Настраиваем xml_rpc.conf.xml. ${NORMAL}"
 mv /etc/freeswitch/autoload_configs/xml_rpc.conf.xml /etc/freeswitch/autoload_configs/xml_rpc.conf.xml.noload
 cp ./freeswitch/autoload_configs/xml_rpc.conf.xml /etc/freeswitch/autoload_configs/xml_rpc.conf.xml
 echo
-echo -e "${BGGREEN}${WHITE} 7 из 7 ${NORMAL}${WHITE} Завершаем настройку FreeSWITCH. ${NORMAL}"
+# Исправляем ошибку IVR меню.
+echo -e "${BGGREEN}${WHITE} 7 из 8 ${NORMAL}${WHITE} Исправляем ошибку IVR меню. ${NORMAL}"
+mv /etc/freeswitch/lang/ru/ru.xml /etc/freeswitch/lang/ru/ru.xml.noload
 echo
+sudo tee /etc/freeswitch/lang/ru/ru.xml << EOF
+<include>
+  <language name="ru" sound-prefix="$${sounds_dir}/ru/RU/vika" tts-engine="cepstral" tts-voice="elena">
+    <phrases>
+      <macros>
+        <X-PRE-PROCESS cmd="include" data="demo/*.xml"/> <!-- Note: this now grabs whole subdir, previously grabbed only demo.xml -->
+        <!--voicemail_en_tts is purely implemented with tts, we have the files based one that is the default. -->
+        <X-PRE-PROCESS cmd="include" data="vm/sounds.xml"/>  <!-- vm/tts.xml if you want to use tts and have cepstral -->
+      </macros>
+    </phrases>
+  </language>
+</include>
+EOF
+echo
+echo -e "${BGGREEN}${WHITE} 8 из 8 ${NORMAL}${WHITE} Завершаем настройку FreeSWITCH. ${NORMAL}"
 # Выводим сообщение об успешной настройки сервера IP телефонии FreeSWITCH
 echo -e "${YELLOW}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NORMAL}"
 echo -e "${YELLOW}┃ ${BGGREEN}${WHITE}                                                ${NORMAL}${YELLOW} ┃${NORMAL}"
